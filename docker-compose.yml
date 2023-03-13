@@ -1,0 +1,47 @@
+version: '3.8'
+services:
+  # api:
+  #   container_name: api-gen
+  #   restart: always
+  #   build: .
+  #   ports:
+  #     - 3000:3000
+  #   depends_on:
+  #     - dbgen
+  #   volumes:
+  #   - .:/usr/src/app
+  #   networks:
+  #     - gen-network
+
+  dbgen:
+    container_name: postgres-gen
+    image: postgres
+    ports:
+      - 5432:5432
+    networks:
+      - gen-network
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    environment:
+      - POSTGRES_PASSWORD=${DB_PASSWORD}
+      - POSTGRES_DB=${DB_NAME}
+
+  pgadmin4-db:
+    container_name: pgadmin4-db
+    image: dpage/pgadmin4
+    environment:
+      PGADMIN_DEFAULT_EMAIL: 'app@gen.com'
+      PGADMIN_DEFAULT_PASSWORD: 'appgen1234'
+    ports:
+      - 8080:80
+    depends_on:
+      - dbgen
+    networks:
+      - gen-network
+networks:
+  gen-network:
+    driver: bridge
+
+
+volumes:
+  pgdata:

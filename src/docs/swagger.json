@@ -1,0 +1,45 @@
+{
+  "swagger": "2.0",
+  "info": {
+    "version": "1.0.0",
+    "title": "Hello API",
+    "description": "API that returns a simple message"
+  },
+  "basePath": "/v1",
+  "paths": {
+    "/products/{idCategory}/categories": {
+      "get": {
+        "tags": ["Categorias"],
+        "summary": "Buscar uma categoria por id",
+        "parameters": [
+          {
+            "name": "idCategory",
+            "in": "path",
+            "description": "ID idCategory",
+            "required": true,
+            "type": "integer"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful response",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "id": {
+                  "type": "integer"
+                },
+                "name": {
+                  "type": "string"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "User not found"
+          }
+        }
+      }
+    }
+  }
+}
