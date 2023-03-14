@@ -22,7 +22,7 @@ export default class CategoryRespository {
     return response;
   }
 
-  async findCategory(idCategory: ICategory): Promise<any> {
+  async findCategory(idCategory: ICategory): Promise<Category> {
     const response = await this.connection.query(
       "SELECT * FROM category WHERE category_id = $1",
       [+idCategory.idCategory]
@@ -31,25 +31,30 @@ export default class CategoryRespository {
     return response.rows[0];
   }
 
-  async updateCategory(params: ICategory, body: Category): Promise<any>{
-    const ifExists = await this.connection.query(
-      "SELECT * FROM category where category_id = $1",
-      [params.idCategory]
-    );
-
-    if (!ifExists.rowCount) {
+  async updateCategory(params: ICategory, body: Category): Promise<any> {
+    const categoryFind = await this.findCategory(params);
+    if (!categoryFind) {
       return false;
     }
-    try {
-      const response = await this.connection.query(
-        "UPDATE category SET name = $1, percentage = $2 WHERE category_id = $3",
-        [body.name, body.percentage, Number(params.idCategory)]
-      );
-      await this.connection.close();
-      return response.rowCount;
-    } catch (error) {
-      console.error(error);
-      
+    const category: Category = { ...body, ...categoryFind };
+    const response = await this.connection.query(
+      "UPDATE category SET name = $1, percentage = $2 WHERE category_id = $3",
+      [category.name, category.percentage, Number(params.idCategory)]
+    );
+    await this.connection.close();
+    return response.rowCount;
+  }
+
+  async deleteCategory(params: ICategory): Promise<any> {
+    const ifExists = await this.findCategory(params);
+    if (!ifExists) {
+      return false;
     }
+    const response = await this.connection.query(
+      "DELETE category  WHERE category_id = $1",
+      [Number(params.idCategory)]
+    );
+    await this.connection.close();
+    return response.rowCount;
   }
 }
