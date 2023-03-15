@@ -20,6 +20,7 @@ export const CATEGORY_NOT_FOUND =
 export const UPDATE_CATEGORY_SUCCESS = "Categoria atualizada com sucesso!";
 export const DELETE_CATEGORY_SUCCESS = "Categoria deletada com sucesso!";
 export const CATEGORY_FOUND_SUCCESS = "Categoria encontrada com sucesso";
+export const PRODUCT_CALCULATE = "Valor de parcelas calculado com sucesso";
 
 // Http-status-code
 export const OK = 200;

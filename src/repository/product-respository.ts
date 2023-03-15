@@ -1,6 +1,7 @@
 import { Product } from "../entities/product";
 import IConnection from "../interface/i-connection";
-import IProduct from "../interface/interfaces";
+import {IProduct} from "../interface/interfaces";
+import { productTransformer } from "../transformer/product";
 
 export default class ProductRespository {
   constructor(readonly connection: IConnection) {}
@@ -22,7 +23,7 @@ export default class ProductRespository {
     return response;
   }
 
-  async findProduct(idProduct: IProduct): Promise<Product> {
+  async findProduct(idProduct: IProduct): Promise<any> {
     const response = await this.connection.query(
       "SELECT * FROM product WHERE product_id = $1",
       [+idProduct.idProduct]
@@ -33,10 +34,14 @@ export default class ProductRespository {
 
   async updateProduct(params: IProduct, body: Product): Promise<any> {
     const productFind = await this.findProduct(params);
+    const productTransformed = productTransformer.transform(productFind);
     if (!productFind) {
       return false;
     }
-    const product: Product = { ...body, ...productFind };
+    const product: Product = {
+      ...productTransformed,
+      ...JSON.parse(JSON.stringify(body)),
+    };
     const response = await this.connection.query(
       "UPDATE product SET name = $1, description = $2, price = $3, category_id = $4   WHERE product_id = $5",
       [
@@ -44,7 +49,7 @@ export default class ProductRespository {
         product.description,
         product.price,
         product.idCategory,
-        Number(params.idCategory),
+        Number(params.idProduct),
       ]
     );
     await this.connection.close();

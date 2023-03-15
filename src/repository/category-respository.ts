@@ -1,8 +1,8 @@
 import { Category } from "../entities/category";
 import IConnection from "../interface/i-connection";
-import ICategory from "../interface/interfaces";
+import {ICategory, ICategoryRespository} from "../interface/interfaces";
 
-export default class CategoryRespository {
+export default class CategoryRespository implements ICategoryRespository {
   constructor(readonly connection: IConnection) {}
 
   async createCategory(body: Category): Promise<any> {
@@ -36,7 +36,10 @@ export default class CategoryRespository {
     if (!categoryFind) {
       return false;
     }
-    const category: Category = { ...body, ...categoryFind };
+    const category: Category = {
+      ...categoryFind,
+      ...JSON.parse(JSON.stringify(body)),
+    };
     const response = await this.connection.query(
       "UPDATE category SET name = $1, percentage = $2 WHERE category_id = $3",
       [category.name, category.percentage, Number(params.idCategory)]

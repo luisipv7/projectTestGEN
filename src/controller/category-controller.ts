@@ -1,10 +1,10 @@
 
 import { Category } from "../entities/category";
 import HttpServer from "../interface/http-server";
-import ICategory from "../interface/interfaces";
+import {ICategory} from "../interface/interfaces";
 import CategoryRespository from "../repository/category-respository";
 import { createCategorySchema, deletecategorySchema, findcategorySchema, updateCategorySchema } from "../validator/categories/category-schema";
-import { ACCEPTED, CATEGORY_FOUND_SUCCESS, CATEGORY_NOT_FOUND, CONFLICT, CREATED, CREATE_CATEGORY_ERROR, CREATE_CATEGORY_SUCCESS, DELETE_CATEGORY_SUCCESS, NOT_FOUND, OK, UPDATE_CATEGORY_SUCCESS } from "../validator/errors/error-codes";
+import { ACCEPTED, CATEGORY_FOUND_SUCCESS, CATEGORY_NOT_FOUND, CONFLICT, CREATED, CREATE_CATEGORY_ERROR, CREATE_CATEGORY_SUCCESS, DELETE_CATEGORY_SUCCESS, NOT_FOUND, OK, UPDATE_CATEGORY_SUCCESS } from "../validator/errors/http-codes";
 import { ResponseCreator } from "../validator/errors/response";
 import { validate } from "../validator/errors/validate";
 
@@ -17,7 +17,7 @@ export default class CategoryController {
   ) {
     httpServer.register(
       "get",
-      "/v1/products/:idCategory/categories",
+      "/v1/categories/:idCategory",
       async function (params: ICategory, body?: any) {
         try {
           validate(params, findcategorySchema);

@@ -1,5 +1,5 @@
 import { ValidationErrorItem } from "joi";
-import { ERR_REQUIRED } from "./error-codes";
+import { ERR_REQUIRED } from "./http-codes";
 
 export class EntityError {
   constructor(
