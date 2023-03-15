@@ -1,0 +1,49 @@
+GET http://localhost:3000/v1/products/1/categories HTTP/1.1
+
+#############
+
+POST http://localhost:3000/v1/category/ HTTP/1.1
+content-type: application/json
+
+{
+    "name": "Móveis",
+    "percentage": 1
+}
+
+#############
+
+PATCH  http://localhost:3000/v1/category/2 HTTP/1.1
+content-type: application/json
+
+{
+    "percentage": 2.5
+}
+
+#############
+
+POST http://localhost:3000/v1/products/ HTTP/1.1
+content-type: application/json
+
+{
+    "name": "Mouse",
+    "description": "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.",
+    "price": 50,
+    "idCategory": 1
+}
+
+############
+
+GET http://localhost:3000/v1/products/1/installments/5 HTTP/1.1
+
+############
+
+GET http://localhost:3000/v1/products/1 HTTP/1.1
+
+#############
+
+PATCH http://localhost:3000/v1/products/1 HTTP/1.1
+content-type: application/json
+
+{
+    "price": 30
+}

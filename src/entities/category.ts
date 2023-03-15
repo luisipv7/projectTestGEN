@@ -1,6 +1,3 @@
-import { createCategorySchema } from "../validator/categories/create-category-schema";
-import { validate } from "../validator/errors/validate";
-
 export class Category {
   public readonly name: string;
   public readonly percentage: number;

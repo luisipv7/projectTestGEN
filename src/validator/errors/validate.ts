@@ -1,10 +1,13 @@
 import { ObjectSchema } from 'joi';
 import { EntityErrorCreator } from './entity-error';
 import { ResponseCreator } from './response';
+import { BAD_REQUEST } from './http-codes';
 export function validate<T>(data: T, schema: ObjectSchema): T {
     const result = schema.validate(data, { abortEarly: false });
     if (result.error) {
-        throw ResponseCreator.errorValidate(EntityErrorCreator.allOf(result.error.details));
+        throw ResponseCreator.errorValidate(
+          BAD_REQUEST, EntityErrorCreator.allOf(result.error.details)
+        );
     }
     return data;
 }

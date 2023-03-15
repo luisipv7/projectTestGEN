@@ -1,14 +1,14 @@
-import {
-  StatusCodes,
-} from "http-status-codes";
+
 import { Category } from "../entities/category";
 import HttpServer from "../interface/http-server";
-import ICategory from "../interface/interfaces";
+import {ICategory} from "../interface/interfaces";
 import CategoryRespository from "../repository/category-respository";
-import { createCategorySchema } from "../validator/categories/create-category-schema";
-import { findcategorySchema } from "../validator/categories/find-category-schema";
+import { createCategorySchema, deletecategorySchema, findcategorySchema, updateCategorySchema } from "../validator/categories/category-schema";
+import { ACCEPTED, CATEGORY_FOUND_SUCCESS, CATEGORY_NOT_FOUND, CONFLICT, CREATED, CREATE_CATEGORY_ERROR, CREATE_CATEGORY_SUCCESS, DELETE_CATEGORY_SUCCESS, NOT_FOUND, OK, UPDATE_CATEGORY_SUCCESS } from "../validator/errors/http-codes";
+import { ResponseCreator } from "../validator/errors/response";
 import { validate } from "../validator/errors/validate";
-import { response } from "../interface/response";
+
+const { success, error } = ResponseCreator;
 
 export default class CategoryController {
   constructor(
@@ -17,14 +17,22 @@ export default class CategoryController {
   ) {
     httpServer.register(
       "get",
-      "/v1/products/:idCategory/categories",
+      "/v1/categories/:idCategory",
       async function (params: ICategory, body?: any) {
         try {
           validate(params, findcategorySchema);
           const res = await categoryRespository.findCategory(params);
-          return {
-            res,
-          };
+          if (!res) {
+            throw error(
+              NOT_FOUND,
+              CATEGORY_NOT_FOUND.replace(
+                "%idCategory%",
+                `${params.idCategory}`
+              ),
+              []
+            );
+          }
+          return success(OK, CATEGORY_FOUND_SUCCESS, res);
         } catch (error) {
           return error;
         }
@@ -40,14 +48,9 @@ export default class CategoryController {
           const user = Category.create(body);
           const res = await categoryRespository.createCategory(user);
           if (!res) {
-            throw {
-              status: StatusCodes.CONFLICT,
-              msg: 'Já existe esta categoria!'}
+            throw error(CONFLICT, CREATE_CATEGORY_ERROR, [])
           }
-          return {
-            status: StatusCodes.CREATED,
-            data: user
-          } as response;
+          return success(CREATED, CREATE_CATEGORY_SUCCESS, user);
         } catch (error) {
           return error;
         }
@@ -59,19 +62,43 @@ export default class CategoryController {
       "/v1/category/:idCategory",
       async function (params: ICategory, body: Category) {
         try {
-          validate(body, createCategorySchema);
-          const user = Category.create(body);
-          const res = await categoryRespository.updateCategory(params, user);
+          validate(body, updateCategorySchema);
+          const res = await categoryRespository.findCategory(params);
           if (!res) {
-            throw {
-              status: StatusCodes.BAD_REQUEST,
-              msg: `Não foi possivel encontrar a categoria com o id ${params.idCategory}!`,
-            };
+            throw error(
+              NOT_FOUND,
+              CATEGORY_NOT_FOUND.replace(
+                "%idCategory%",
+                `${params.idCategory}`
+              ),
+              []
+            );
           }
-          return {
-            status: StatusCodes.ACCEPTED,
-            msg: 'Atualizado com sucesso!'
-          } as response
+          const user = Category.create(body);
+          await categoryRespository.updateCategory(params, user);
+          return success(ACCEPTED, UPDATE_CATEGORY_SUCCESS, null);
+        } catch (error) {
+          return error;
+        }
+      }
+    );
+
+    httpServer.register(
+      "delete",
+      "/v1/category/:idCategory",
+      async function (params: ICategory, body?: Category) {
+        try {
+          validate(params, deletecategorySchema);
+          const res = await categoryRespository.findCategory(params);
+          if (!res) {
+            throw error(
+              NOT_FOUND,
+              CATEGORY_NOT_FOUND.replace("%idCategory%", `${params.idCategory}`),
+              []
+            )
+          }
+          await categoryRespository.deleteCategory(params);
+          return success(OK, DELETE_CATEGORY_SUCCESS, null);
         } catch (error) {
           return error;
         }
